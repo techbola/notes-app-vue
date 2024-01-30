@@ -2,16 +2,44 @@
   import {ref} from "vue";
 
   const showModal = ref(false);
+  const note = ref("");
+  const notes = ref([]);
+
+  const closeModal = () => {
+    showModal.value = false;
+    note.value = "";
+  }
+
+  const addNote = () => {
+    const newNote = {
+      id: Math.floor(Math.random() * 1000000),
+      text: note.value,
+      date: new Date(),
+      bgColor: generateColor()
+    };
+    notes.value.push(newNote);
+    closeModal();
+  }
+
+  const generateColor = () => {
+    return "hsl(" + Math.random() * 360 + ", 100%, 75%)"
+  }
 </script>
 
 <template>
   <main>
     <div v-if="showModal" class="overlay">
       <div class="modal">
-        <textarea name="note" id="note" cols="30" rows="10"></textarea>
+        <textarea 
+          name="note" 
+          id="note" 
+          cols="30" 
+          rows="10"
+          v-model="note"
+          ></textarea>
         <div class="actions">
-          <button @click="showModal = false" class="close-modal">Close</button>
-          <button class="add-note-button">Add Note</button>
+          <button @click="closeModal" class="close-modal">Close</button>
+          <button @click="addNote" class="add-note-button">Add Note</button>
         </div>
       </div>
     </div>
@@ -22,18 +50,13 @@
         <button @click="showModal = true">+</button>
       </header>
       <div class="cards-container">
-        <div class="card">
-          <p class="main-text">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis, mollitia!
-          </p>
-          <p class="date">26/1/2024</p>
-        </div>
-
-        <div class="card">
-          <p class="main-text">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Officiis, mollitia!
-          </p>
-          <p class="date">26/1/2024</p>
+        <div 
+          class="card" v-for="note in notes" 
+          :key="note.id"
+          :style="{backgroundColor: note.bgColor}"
+        >
+          <p class="main-text">{{ note.text }}</p>
+          <p class="date">{{ note.date.toLocaleDateString("en-US") }}</p>
         </div>
       </div>
     </div>
