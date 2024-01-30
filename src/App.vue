@@ -4,6 +4,7 @@
   const showModal = ref(false);
   const note = ref("");
   const notes = ref([]);
+  const errorMsg = ref("");
 
   const closeModal = () => {
     showModal.value = false;
@@ -11,18 +12,29 @@
   }
 
   const addNote = () => {
-    const newNote = {
-      id: Math.floor(Math.random() * 1000000),
-      text: note.value,
-      date: new Date(),
-      bgColor: generateColor()
-    };
-    notes.value.push(newNote);
-    closeModal();
+    if (validateInput()) {
+      const newNote = {
+        id: Math.floor(Math.random() * 1000000),
+        text: note.value,
+        date: new Date(),
+        bgColor: generateColor()
+      };
+      notes.value.push(newNote);
+      closeModal();
+    }
   }
 
   const generateColor = () => {
     return "hsl(" + Math.random() * 360 + ", 100%, 75%)"
+  }
+
+  const validateInput = () => {
+    if (note.value.length < 10) {
+      errorMsg.value = "Note needs to be 10 characters or more!";
+      return false;
+    }
+    errorMsg.value = "";
+    return true;
   }
 </script>
 
@@ -35,8 +47,11 @@
           id="note" 
           cols="30" 
           rows="10"
-          v-model="note"
-          ></textarea>
+          v-model.trim="note"
+        ></textarea>
+
+        <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
+
         <div class="actions">
           <button @click="closeModal" class="close-modal">Close</button>
           <button @click="addNote" class="add-note-button">Add Note</button>
@@ -161,6 +176,10 @@
   }
 
   .close-modal {
-    background-color: red;
+    background-color: rgb(193, 15, 15);
+  }
+
+  .error {
+    color: rgb(193, 15, 15);
   }
 </style>
